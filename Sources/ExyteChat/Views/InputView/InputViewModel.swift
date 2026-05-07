@@ -14,6 +14,7 @@ final class InputViewModel: ObservableObject {
     @Published var attachments = InputViewAttachments()
     @Published var state: InputViewState = .empty
 
+    @Published var showFilePicker = false
     @Published var showPicker = false
   
     @Published var mediaPickerMode = MediaPickerMode.photos
@@ -39,6 +40,7 @@ final class InputViewModel: ObservableObject {
     func onStart() {
         subscribeValidation()
         subscribePicker()
+        subscribeFilePicker()
     }
 
     func onStop() {
@@ -46,6 +48,7 @@ final class InputViewModel: ObservableObject {
     }
 
     func reset() {
+        showFilePicker = false
         showPicker = false
         text = ""
         saveEditingClosure = nil
@@ -75,6 +78,8 @@ final class InputViewModel: ObservableObject {
 
     private func inputViewActionInternal(_ action: InputViewAction) {
         switch action {
+        case .file:
+            showFilePicker = true
         case .photo:
             mediaPickerMode = .photos
             showPicker = true
@@ -158,10 +163,11 @@ private extension InputViewModel {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             guard state != .editing else { return } // special case
-            if !self.text.isEmpty || !self.attachments.medias.isEmpty {
+            if !self.text.isEmpty || !self.attachments.medias.isEmpty || !self.attachments.files.isEmpty {
                 self.state = .hasTextOrMedia
             } else if self.text.isEmpty,
                       self.attachments.medias.isEmpty,
+                      self.attachments.files.isEmpty,
                       self.attachments.recording == nil {
                 self.state = .empty
             }
@@ -185,6 +191,16 @@ private extension InputViewModel {
             .sink { [weak self] value in
                 if !value {
                     self?.attachments.medias = []
+                }
+            }
+            .store(in: &subscriptions)
+    }
+
+    func subscribeFilePicker() {
+        $showFilePicker
+            .sink { [weak self] value in
+                if !value {
+                    self?.attachments.files = []
                 }
             }
             .store(in: &subscriptions)
@@ -214,6 +230,7 @@ private extension InputViewModel {
         let draft = DraftMessage(
             text: text,
             medias: attachments.medias,
+            files: attachments.files.map { File(id: UUID().uuidString, localURL: $0, name: $0.lastPathComponent, downloadState: .complete) },
             recording: attachments.recording,
             replyMessage: attachments.replyMessage,
             createdAt: Date()

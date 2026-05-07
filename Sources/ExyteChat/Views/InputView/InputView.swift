@@ -15,6 +15,7 @@ public enum InputViewStyle: Sendable {
 
 public enum InputViewAction: Sendable {
     case photo
+    case file
     case add
     case camera
     case send
@@ -58,9 +59,11 @@ public enum AvailableInputType: Sendable {
     case text
     case media
     case audio
+    case file
 }
 
 public struct InputViewAttachments {
+    var files: [URL] = []
     var medias: [Media] = []
     var recording: Recording?
     var replyMessage: ReplyMessage?
@@ -140,7 +143,7 @@ struct InputView: View {
         } else {
             switch style {
             case .message:
-                if isMediaAvailable() {
+                if isFileAvailable() {
                     attachButton
                 }
             case .signature:
@@ -326,11 +329,31 @@ struct InputView: View {
     
     var attachButton: some View {
         Button {
-            onAction(.photo)
+            onAction(.file)
         } label: {
             theme.images.inputView.attach
                 .viewSize(24)
                 .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 6))
+        }
+        .fileImporter(
+            isPresented: $viewModel.showFilePicker,
+            allowedContentTypes: [.item],
+            allowsMultipleSelection: true
+        ) { result in
+            switch result {
+            case .success(let files):
+                files.forEach { file in
+                    // gain access to the directory
+                    let gotAccess = file.startAccessingSecurityScopedResource()
+                    if !gotAccess { return }
+                    viewModel.attachments.files.append(file)
+                    // release access
+                    file.stopAccessingSecurityScopedResource()
+               }
+               onAction(.send)
+            case .failure(let error):
+               print(error)
+            }
         }
     }
     
@@ -576,6 +599,10 @@ struct InputView: View {
     
     private func isMediaAvailable() -> Bool {
         return availableInputs.contains(AvailableInputType.media)
+    }
+
+    private func isFileAvailable() -> Bool {
+        return availableInputs.contains(AvailableInputType.file)
     }
 }
 

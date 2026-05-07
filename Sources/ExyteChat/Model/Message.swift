@@ -56,6 +56,7 @@ open class Message: ObservableObject, Identifiable {
 
     @Published open var attributedText: AttributedString
     @Published open var attachments: [Attachment]
+    @Published open var files: [File]
     @Published open var reactions: [Reaction]
     @Published open var recording: Recording?
     @Published open var replyMessage: ReplyMessage?
@@ -74,6 +75,7 @@ open class Message: ObservableObject, Identifiable {
         createdAt: Date = Date(),
         text: String = "",
         attachments: [Attachment] = [],
+        files: [File] = [],
         reactions: [Reaction] = [],
         recording: Recording? = nil,
         replyMessage: ReplyMessage? = nil,
@@ -85,6 +87,7 @@ open class Message: ObservableObject, Identifiable {
         self.createdAt = createdAt
         self.attributedText = text.applyDefaultAttributes()
         self.attachments = attachments
+        self.files = files
         self.reactions = reactions
         self.recording = recording
         self.replyMessage = replyMessage
@@ -98,6 +101,7 @@ open class Message: ObservableObject, Identifiable {
         createdAt: Date = Date(),
         attributedText: AttributedString,
         attachments: [Attachment] = [],
+        files: [File] = [],
         reactions: [Reaction] = [],
         recording: Recording? = nil,
         replyMessage: ReplyMessage? = nil,
@@ -109,6 +113,7 @@ open class Message: ObservableObject, Identifiable {
         self.createdAt = createdAt
         self.attributedText = attributedText
         self.attachments = attachments
+        self.files = files
         self.reactions = reactions
         self.recording = recording
         self.replyMessage = replyMessage
@@ -144,6 +149,7 @@ open class Message: ObservableObject, Identifiable {
             createdAt: draft.createdAt,
             text: draft.text,
             attachments: attachments,
+            files: draft.files,
             recording: draft.recording,
             replyMessage: draft.replyMessage
         )
@@ -164,6 +170,7 @@ extension Message: Equatable {
         lhs.createdAt == rhs.createdAt &&
         lhs.attributedText == rhs.attributedText &&
         lhs.attachments == rhs.attachments &&
+        lhs.files == rhs.files &&
         lhs.reactions == rhs.reactions &&
         lhs.recording == rhs.recording &&
         lhs.replyMessage == rhs.replyMessage &&
@@ -179,6 +186,7 @@ extension Message: Hashable {
         hasher.combine(self.createdAt)
         hasher.combine(self.attributedText)
         hasher.combine(self.attachments)
+        hasher.combine(self.files)
         hasher.combine(self.recording)
         hasher.combine(self.replyMessage)
     }
@@ -207,6 +215,7 @@ public class ReplyMessage: ObservableObject, Codable, Identifiable {
         case createdAt
         case attributedText
         case attachments
+        case files
         case recording
     }
 
@@ -216,6 +225,7 @@ public class ReplyMessage: ObservableObject, Codable, Identifiable {
 
     @Published public var attributedText: AttributedString
     @Published public var attachments: [Attachment]
+    @Published public var files: [File]
     @Published public var recording: Recording?
 
     public var text: String {
@@ -228,6 +238,7 @@ public class ReplyMessage: ObservableObject, Codable, Identifiable {
         createdAt: Date,
         text: String = "",
         attachments: [Attachment] = [],
+        files: [File] = [],
         recording: Recording? = nil
     ) {
         self.id = id
@@ -235,6 +246,7 @@ public class ReplyMessage: ObservableObject, Codable, Identifiable {
         self.createdAt = createdAt
         self.attributedText = text.applyDefaultAttributes()
         self.attachments = attachments
+        self.files = files
         self.recording = recording
     }
 
@@ -244,6 +256,7 @@ public class ReplyMessage: ObservableObject, Codable, Identifiable {
         createdAt: Date,
         attributedText: AttributedString,
         attachments: [Attachment] = [],
+        files: [File] = [],
         recording: Recording? = nil
     ) {
         self.id = id
@@ -251,6 +264,7 @@ public class ReplyMessage: ObservableObject, Codable, Identifiable {
         self.createdAt = createdAt
         self.attributedText = attributedText
         self.attachments = attachments
+        self.files = files
         self.recording = recording
     }
 
@@ -261,6 +275,7 @@ public class ReplyMessage: ObservableObject, Codable, Identifiable {
         createdAt = try container.decode(Date.self, forKey: .createdAt)
         attributedText = try container.decode(AttributedString.self, forKey: .attributedText)
         attachments = try container.decode([Attachment].self, forKey: .attachments)
+        files = try container.decode([File].self, forKey: .files)
         recording = try container.decode(Recording?.self, forKey: .recording)
     }
 
@@ -271,11 +286,12 @@ public class ReplyMessage: ObservableObject, Codable, Identifiable {
         try container.encode(createdAt, forKey: .createdAt)
         try container.encode(attributedText, forKey: .attributedText)
         try container.encode(attachments, forKey: .attachments)
+        try container.encode(files, forKey: .files)
         try container.encode(recording, forKey: .recording)
     }
 
     func toMessage() -> Message {
-        Message(id: id, user: user, createdAt: createdAt, attributedText: attributedText, attachments: attachments, recording: recording)
+        Message(id: id, user: user, createdAt: createdAt, attributedText: attributedText, attachments: attachments, files: files, recording: recording)
     }
 }
 
@@ -286,6 +302,7 @@ extension ReplyMessage: Equatable {
         lhs.createdAt == rhs.createdAt &&
         lhs.attributedText == rhs.attributedText &&
         lhs.attachments == rhs.attachments &&
+        lhs.files == rhs.files &&
         lhs.recording == rhs.recording
     }
 }
@@ -297,12 +314,13 @@ extension ReplyMessage: Hashable {
         hasher.combine(self.createdAt)
         hasher.combine(self.attributedText)
         hasher.combine(self.attachments)
+        hasher.combine(self.files)
         hasher.combine(self.recording)
     }
 }
 
 public extension Message {
     func toReplyMessage() -> ReplyMessage {
-        ReplyMessage(id: id, user: user, createdAt: createdAt, attributedText: attributedText, attachments: attachments, recording: recording)
+        ReplyMessage(id: id, user: user, createdAt: createdAt, attributedText: attributedText, attachments: attachments, files: files, recording: recording)
     }
 }
