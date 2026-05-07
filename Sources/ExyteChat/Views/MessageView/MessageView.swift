@@ -21,6 +21,7 @@ struct MessageView: View {
     @Binding var timeViewWidth: CGFloat // hack to pass real updates through UIKit
     @Binding var reactionViewWidth: CGFloat // hack to pass real updates through UIKit
     let isDisplayingMessageMenu: Bool
+    let localization: ChatLocalization
 
     static let widthWithMedia: CGFloat = 204
     static let statusViewWidth: CGFloat = 10
@@ -159,7 +160,7 @@ struct MessageView: View {
 
                 if !message.files.isEmpty {
                     ForEach(message.files) { file in
-                        FileView(file: file, isCurrentUser: message.user.isCurrentUser, checkSizeClosure: params.checkFileSizeClosure, downloadClosure: params.downloadFileClosure)
+                        FileView(file: file, isCurrentUser: message.user.isCurrentUser, checkSizeClosure: params.checkFileSizeClosure, downloadClosure: params.downloadFileClosure, localization: localization)
                             .padding(.horizontal, 7)
                     }
 
@@ -210,7 +211,7 @@ struct MessageView: View {
 
             if !message.files.isEmpty {
                 ForEach(message.files) { file in
-                    FileView(file: file, isCurrentUser: message.user.isCurrentUser, checkSizeClosure: params.checkFileSizeClosure, downloadClosure: params.downloadFileClosure)
+                    FileView(file: file, isCurrentUser: message.user.isCurrentUser, checkSizeClosure: params.checkFileSizeClosure, downloadClosure: params.downloadFileClosure, localization: localization)
                         .padding(.horizontal, 7)
                 }
             }

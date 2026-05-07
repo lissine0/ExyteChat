@@ -21,6 +21,7 @@ struct ChatMessageView<MessageContent: View>: View {
     @Binding var timeViewWidth: CGFloat
     @Binding var reactionViewWidth: CGFloat
     let isDisplayingMessageMenu: Bool
+    let localization: ChatLocalization
 
     @State var timeViewSize: CGSize?
 
@@ -50,7 +51,8 @@ struct ChatMessageView<MessageContent: View>: View {
                     params: messageParams,
                     timeViewWidth: $timeViewWidth,
                     reactionViewWidth: $reactionViewWidth,
-                    isDisplayingMessageMenu: isDisplayingMessageMenu
+                    isDisplayingMessageMenu: isDisplayingMessageMenu,
+                    localization: localization
                 )
             } else {
                 customMessageView

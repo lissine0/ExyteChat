@@ -16,6 +16,10 @@ private struct ReactionViewWidthBindingEnvironmentKey: EnvironmentKey {
     static let defaultValue: Binding<CGFloat> = .constant(0)
 }
 
+private struct ChatLocalizationEnvironmentKey: EnvironmentKey {
+    static let defaultValue = ChatLocalization.defaultLocalization
+}
+
 extension EnvironmentValues {
     var chatMessageType: ChatType {
         get { self[ChatMessageTypeEnvironmentKey.self] }
@@ -35,5 +39,10 @@ extension EnvironmentValues {
     var reactionViewWidthBinding: Binding<CGFloat> {
         get { self[ReactionViewWidthBindingEnvironmentKey.self] }
         set { self[ReactionViewWidthBindingEnvironmentKey.self] = newValue }
+    }
+
+    var chatLocalization: ChatLocalization {
+        get { self[ChatLocalizationEnvironmentKey.self] }
+        set { self[ChatLocalizationEnvironmentKey.self] = newValue }
     }
 }

@@ -8,6 +8,7 @@ struct DefaultMessageView: View {
     @Environment(\.messageCustomizationParams) private var customizationParams
     @Environment(\.timeViewWidthBinding) private var timeViewWidth
     @Environment(\.reactionViewWidthBinding) private var reactionViewWidth
+    @Environment(\.chatLocalization) private var localization
 
     init(params: MessageBuilderParameters) {
         self.params = params
@@ -23,7 +24,8 @@ struct DefaultMessageView: View {
             params: customizationParams,
             timeViewWidth: timeViewWidth,
             reactionViewWidth: reactionViewWidth,
-            isDisplayingMessageMenu: false
+            isDisplayingMessageMenu: false,
+            localization: localization
         )
     }
 }
